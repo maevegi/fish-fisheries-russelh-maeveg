@@ -35,7 +35,7 @@ mtcars %>%
 
 ![](fish-assignment_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
 
------
+------------------------------------------------------------------------
 
 # Exercise 2: Group Assignment
 
