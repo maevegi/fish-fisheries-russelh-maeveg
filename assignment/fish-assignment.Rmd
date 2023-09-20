@@ -6,7 +6,41 @@ output:
 
 ```{r setup, message = FALSE}
 library(tidyverse)
+library(readxl)
 ```
+```{r}
+download.file("https://zenodo.org/record/7814638/files/RAMLDB%20v4.61.zip?download=1", "fish.zip")
+```
+```{r}
+unzip("fish.zip")
+```
+
+```{r}
+mcatch<-read_csv("RAMCore/MCatch.csv")
+mcatch
+```
+```{r}
+xlsx<-"Excel/RAMLDB v4.61 (assessment data only).xlsx"
+readxl::excel_sheets(xlsx)
+
+ts1<-read_xlsx(xlsx, sheet="timeseries.1")
+ts2<-read_xlsx(xlsx, sheet="timeseries.2")
+
+ts<-bind_rows(ts1, ts2) |> 
+  distinct()|> 
+  filter(tsid=="TCbest-MT")
+```
+```{r}
+metrics<- read_xlsx(xlsx, sheet= "tsmetrics")
+units<-metrics |> 
+  filter (tscategory=="CATCH or LANDINGS") |>
+  filter(tsunitslong=="Metric tons")
+```
+```{r}
+ts<-ts|> left_join(metrics, by=c("tsid"="tsunique"))
+ts
+```
+
 
 # Unit 2: Fisheries Collapse Module
 
