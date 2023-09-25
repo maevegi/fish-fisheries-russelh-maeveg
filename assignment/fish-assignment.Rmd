@@ -65,7 +65,10 @@ We want to examine Atlantic cod, _Gadus mordhua_.
 ```{r}
 fish |> 
   filter(scientificname =="Gadus morhua")|>
-  inner_join(most_recent)
+  inner_join(most_recent)|>
+  group_by(tsyear) |>
+  summarise(total = sum(tsvalue, na.rm=TRUE))|>
+  ggplot(aes(tsyear, total))+geom_point()+geom_line()
  
 ```
 
