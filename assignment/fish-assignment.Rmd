@@ -42,6 +42,19 @@ ts
 ```
 
 
+```{r}
+metrics<- read_xlsx(xlsx, sheet= "stock")
+units<-metrics |> 
+  filter (tscategory=="CATCH or LANDINGS") |>
+  filter(tsunitslong=="Metric tons")
+```
+
+```{r}
+ts<-ts|> left_join(metrics, by=c("stock"))
+ts
+```
+
+
 # Unit 2: Fisheries Collapse Module
 
 This module will focus on understanding and replicating fisheries stock assessment data and fisheries collapse.
