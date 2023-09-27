@@ -34,6 +34,7 @@ ts<-bind_rows(ts1, ts2) |>
   distinct()|> 
   filter(tsid=="TCbest-MT")
 ```
+
 ```{r}
 most_recent<-
   assess|>
@@ -41,45 +42,80 @@ most_recent<-
   filter(commonname=="Atlantic cod")|>
   filter(mostrecent==999)|>
   select(assessid)
+most_recent
 ```
 
 ```{r}
-
 units<-metrics |> 
   filter (tscategory=="CATCH or LANDINGS") |>
   filter(tsunitslong=="Metric tons")
+units
 ```
+
 ```{r}
 ts<-ts|> left_join(metrics, by=c("tsid"="tsunique"))
 ts
 ```
-```{r}
 
+```{r}
+area |> 
+  filter(country == "Canada") |>
+  distinct(country, areacode)
+```
+
+```{r}
 fish<- ts|> 
   left_join(metrics, by=c("tsid"="tsunique"))|>
   left_join(stock)|>
   left_join(area)
 fish
 ```
+
 We want to examine Atlantic cod, _Gadus mordhua_. 
 ```{r}
-fish |> 
-  filter(scientificname =="Gadus morhua")|>
-  inner_join(most_recent)|>
+cod <- fish |> 
+  filter(scientificname == "Gadus morhua") |>
+  filter(country == "Canada") |>
+  inner_join(most_recent, by = "assessid") 
+cod
+```
+
+```{r}
+cod_2J3KL <- fish |>
+  filter(scientificname == "Gadus morhua") |>
+  filter(stockid == "COD2J3KL") |>
+  filter(areaid == "Canada-DFO-2J3KL") |>
+  inner_join(most_recent, by = "assessid")
+cod_2J3KL
+```
+
+```{r}
+cod_2J3KL |> 
+  select(tsyear, tsvalue, stockid, areaid) |>
+  mutate(collapsed = tsvalue < 0.1*max(tsvalue)) 
+```
+
+
+```{r}
+cod |>
+  filter(scientificname == "Gadus morhua") |>
+  filter(areaname == "Southern Labrador-Eastern Newfoundland") |>
+  inner_join(most_recent, by = "assessid") |>
   group_by(tsyear) |>
-  summarise(total = sum(tsvalue, na.rm=TRUE))|>
-  ggplot(aes(tsyear, total))+geom_point()+geom_line()
- 
+  summarise(total = sum(tsvalue, na.rm = TRUE)) |>
+  ggplot(mapping=aes(tsyear, total)) + geom_point() + geom_line()
 ```
-
+```{r}
+mea_cod <- cod |>
+  filter(assessid == "DFO-NFLD-COD2J3KL-1850-2011-CHING")
 ```
-
 
 ```{r}
 metrics<- read_xlsx(xlsx, sheet= "stock")
 units<-metrics |> 
   filter (tscategory=="CATCH or LANDINGS") |>
   filter(tsunitslong=="Metric tons")
+metrics
 ```
 
 ```{r}
