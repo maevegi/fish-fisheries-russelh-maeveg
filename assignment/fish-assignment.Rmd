@@ -25,13 +25,26 @@ readxl::excel_sheets(xlsx)
 
 ts1<-read_xlsx(xlsx, sheet="timeseries.1")
 ts2<-read_xlsx(xlsx, sheet="timeseries.2")
+area<- read_xlsx(xlsx, sheet= "area")
+stock<- read_xlsx(xlsx, sheet= "stock")
+metrics<- read_xlsx(xlsx, sheet= "tsmetrics")
+assess<- read_xlsx(xlsx, sheet="assessment")
 
 ts<-bind_rows(ts1, ts2) |> 
   distinct()|> 
   filter(tsid=="TCbest-MT")
 ```
 ```{r}
-metrics<- read_xlsx(xlsx, sheet= "tsmetrics")
+most_recent<-
+  assess|>
+  left_join(stock) |>
+  filter(commonname=="Atlantic cod")|>
+  filter(mostrecent==999)|>
+  select(assessid)
+```
+
+```{r}
+
 units<-metrics |> 
   filter (tscategory=="CATCH or LANDINGS") |>
   filter(tsunitslong=="Metric tons")
@@ -39,6 +52,26 @@ units<-metrics |>
 ```{r}
 ts<-ts|> left_join(metrics, by=c("tsid"="tsunique"))
 ts
+```
+```{r}
+
+fish<- ts|> 
+  left_join(metrics, by=c("tsid"="tsunique"))|>
+  left_join(stock)|>
+  left_join(area)
+fish
+```
+We want to examine Atlantic cod, _Gadus mordhua_. 
+```{r}
+fish |> 
+  filter(scientificname =="Gadus morhua")|>
+  inner_join(most_recent)|>
+  group_by(tsyear) |>
+  summarise(total = sum(tsvalue, na.rm=TRUE))|>
+  ggplot(aes(tsyear, total))+geom_point()+geom_line()
+ 
+```
+
 ```
 
 
