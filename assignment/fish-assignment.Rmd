@@ -28,6 +28,7 @@ ts2<-read_xlsx(xlsx, sheet="timeseries.2")
 area<- read_xlsx(xlsx, sheet= "area")
 stock<- read_xlsx(xlsx, sheet= "stock")
 metrics<- read_xlsx(xlsx, sheet= "tsmetrics")
+metrics
 assess<- read_xlsx(xlsx, sheet="assessment")
 
 ts<-bind_rows(ts1, ts2) |> 
@@ -89,9 +90,20 @@ cod_2J3KL
 ```
 
 ```{r}
-cod_2J3KL |> 
+collapse<-cod_2J3KL |> 
   select(tsyear, tsvalue, stockid, areaid) |>
-  mutate(collapsed = tsvalue < 0.1*max(tsvalue)) 
+  mutate(collapsed = tsvalue < 0.1*max(tsvalue, na.rm=TRUE))
+```
+```{r}
+collapse |>
+  filter(country=="Canada")|>
+  inner_join(most_recent, by="assessid")|>
+  filter(scientificname =="Gadus morhua")|>
+  group_by(stockid)|>
+  mutate(collapsed=tsvalue<0.10* max(tsvalue, na.rm=TRUE))
+```
+```{r}
+
 ```
 
 
@@ -109,19 +121,7 @@ mea_cod <- cod |>
   filter(assessid == "DFO-NFLD-COD2J3KL-1850-2011-CHING")
 ```
 
-```{r}
-#metrics<- read_xlsx(xlsx, sheet= "stock")
-#units<-metrics |> 
-#  filter(tscategory=="CATCH or LANDINGS") |>
-#  filter(tsunitslong=="Metric tons")
-#metrics
 ```
-
-```{r}
-ts<-ts|> left_join(metrics, by=c("stock"))
-ts
-```
-
 
 # Unit 2: Fisheries Collapse Module
 
@@ -138,12 +138,6 @@ We will use data from the [RAM Legacy Stock Assessment Database](https://www.ram
 Now we are ready to dive into our data. First, We seek to replicate the following figure from the Millennium Ecosystem Assessment Project using the RAM data.
 
 ![](http://espm-157.carlboettiger.info/img/cod.jpg)
-
-## placeholder
-
-```{r}
-mtcars %>% 
- ggplot(aes(disp, mpg)) + geom_point()
 ```
 
 ------------------------------------------------------------------------
@@ -155,3 +149,21 @@ mtcars %>%
 We seek to replicate the temporal trend in stock declines shown in [Worm et al 2006](http://doi.org/10.1126/science.1132294):
 
 ![](http://espm-157.carlboettiger.info/img/worm2006.jpg)
+```{r}
+total_cod <- fish |> 
+  filter(scientificname == "Gadus morhua") |>
+  filter(country == "Russia") |>
+  inner_join(most_recent, by = "assessid") 
+total_cod
+```
+```{r}
+total_cod |> 
+  group_by(stockid)|>
+  group_by(tsyear)|>
+  mutate(collapsed=tsvalue<0.10* max(tsvalue, na.rm=TRUE))
+  #find total number of stocks collapsed by year first
+#true is also equal to 1, false is equal to zero
+```
+
+```
+
