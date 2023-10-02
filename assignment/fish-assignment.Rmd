@@ -46,10 +46,10 @@ most_recent
 ```
 
 ```{r}
-# units<-metrics |> 
-#  filter(tscategory=="CATCH or LANDINGS") |>
-#  filter(tsunitslong=="Metric tons")
-#units
+units<-metrics |> 
+  filter(tscategory=="CATCH or LANDINGS") |>
+  filter(tsunitslong=="Metric tons")
+units
 ```
 ```{r}
 ts<-ts|> left_join(metrics, by=c("tsid"="tsunique"))
