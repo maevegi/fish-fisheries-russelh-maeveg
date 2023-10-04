@@ -154,10 +154,10 @@ total_cod |>
   mutate(collapsed=tsvalue<0.10* max(tsvalue, na.rm=TRUE))
 ```
 ```{r}
-#total_cod|>
-  #filter(collapsed == "TRUE")|>
-  #ggplot(aes(x = tsyear, y = collapsed)) + geom_point()
-#total_cod
+total_cod|>
+  filter(collapsed==TRUE)|>
+  ggplot(aes(x = tsyear, y = collapsed)) + geom_point()
+total_cod
 ```
 
   #find total number of stocks collapsed by year first
