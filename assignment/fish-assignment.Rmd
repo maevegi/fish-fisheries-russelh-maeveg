@@ -110,11 +110,11 @@ mea_cod <- cod |>
 ```
 
 ```{r}
-#metrics<- read_xlsx(xlsx, sheet= "stock")
-#units<-metrics |> 
-#  filter(tscategory=="CATCH or LANDINGS") |>
-#  filter(tsunitslong=="Metric tons")
-#metrics
+metrics<- read_xlsx(xlsx, sheet= "stock")
+units<-metrics |> 
+  filter(tscategory=="CATCH or LANDINGS") |>
+  filter(tsunitslong=="Metric tons")
+metrics
 ```
 
 ```{r}
