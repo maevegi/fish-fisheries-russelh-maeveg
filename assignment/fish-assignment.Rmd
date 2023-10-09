@@ -88,7 +88,7 @@ cod_2J3KL <- fish |>
   inner_join(most_recent, by = "assessid")
 cod_2J3KL
 ```
-
+#Determining which Canadian cod stocks are considered collapsed
 ```{r}
 collapse<-cod_2J3KL |> 
   select(tsyear, tsvalue, stockid, areaid) |>
@@ -148,7 +148,7 @@ total_cod
 ```
 
 ```{r}
-total_cod |> 
+total_cod=total_cod |> 
   group_by(stockid)|>
   group_by(tsyear)|>
   mutate(collapsed=tsvalue<0.10* max(tsvalue, na.rm=TRUE))
@@ -158,8 +158,12 @@ total_cod|>
   filter(collapsed==TRUE)|>
   ggplot(aes(x = tsyear, y = collapsed)) + geom_point()
 total_cod
+#Use taxa as species
+#group by species and then sort by collapsed (true/false)
+# calculate collapse value per stock 
 ```
-
+Find lowest common denominator of stocks in the earliest year 
+Denominator could be total number of stocks reported in study (look at paper on course website)- percentage of what total number of stocks 
   #find total number of stocks collapsed by year first
 #true is also equal to 1, false is equal to zero
 #if true then plot it
