@@ -162,11 +162,40 @@ total_cod
 #group by species and then sort by collapsed (true/false)
 # calculate collapse value per stock 
 ```
+#Notes
 Find lowest common denominator of stocks in the earliest year 
 Denominator could be total number of stocks reported in study (look at paper on course website)- percentage of what total number of stocks 
   #find total number of stocks collapsed by year first
-#true is also equal to 1, false is equal to zero
-#if true then plot it
+true is also equal to 1, false is equal to zero
+if true then plot it
+#Assessing multiple species data
+```{r}
+recent_species<-
+  assess|>
+  left_join(stock) |>
+  filter(mostrecent==999)|>
+  select(assessid)
+recent_species
+```
+
+```{r}
+all_species<-fish|>
+  inner_join(recent_species, by = "assessid")|>
+  group_by(scientificname)|>
+  #group_by(stockid)
+ mutate(collapsed=tsvalue<0.10* max(tsvalue, na.rm=TRUE))
+all_species
+```
+Create a new column that assigns a numeric value to TRUE or FALSE from collapse column. Plot data based on these values (1 or 0). 
+```{r}
+
+all_species<-
+ mutate(collapsed_value=ifelse(collapsed=="TRUE", 1, 0))
+  #summarize(sum=sum(collapsed))
+
+
+ # mutate(collapsed_value=ifelse(collapsed==TRUE, 1, 0))
+
 ```
 
 ```
