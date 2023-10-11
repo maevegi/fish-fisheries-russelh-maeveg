@@ -169,6 +169,43 @@ Denominator could be total number of stocks reported in study (look at paper on 
   #find total number of stocks collapsed by year first
 true is also equal to 1, false is equal to zero
 if true then plot it
+
+#All species
+```{r}
+all_species <- fish |>
+  filter(tsid == "TCbest-MT") |>
+  group_by(tsyear,scientificname) |>
+  summarise(total_catch = sum(tsvalue, na.rm = TRUE)) |>
+  group_by(scientificname) |>
+  mutate(historical_max = max(total_catch), #historical maximum of catch 
+        is_collapse = total_catch < 0.1 * historical_max, ever_collapse = cumsum(is_collapse) > 0)
+all_species
+```
+
+#1950-2020
+```{r}
+time_span <- 1950:2020
+
+
+recent_data <- nrow(all_species %>%
+                      #group_by(scientificname, tsyear) |>
+                      filter(tsyear %in% time_span) |>
+                      #group_by(scientificname) |>
+                      count() |>
+                      filter(recent_data == length(time_span)))
+recent_data
+#how many years each species is observed
+recent_data<-nrow(all_species|>
+                    filter(tsyear %in% time_span)|>
+                    group_by(scientificname)|>
+                    count())
+```
+```{r}
+
+```
+
+#calculate cumulative number of stocks collapsed (ie show number of collapsed stocks by 1960, instead of number of stocks colapsed in each year)
+
 #Assessing multiple species data
 ```{r}
 recent_species<-
@@ -180,10 +217,12 @@ recent_species
 ```
 Total species count table
 ```{r}
-all_species<-fish|>
-  inner_join(recent_species, by = "assessid")|>
-  group_by(scientificname)|>
-  #group_by(stockid)
+all_species_prop<-all_species|>
+  filter(tsyear %in% time_span)|>
+  group_by(tsyear)|>
+  summarise(collapse=sum(is_collapse),
+            cumu_collapsed/recent_data)|>
+  select(tsyear, )
  mutate(collapsed=tsvalue<0.10* max(tsvalue, na.rm=TRUE))
 all_species
 ```
@@ -191,7 +230,7 @@ Create a new column that assigns a numeric value to TRUE or FALSE from collapse 
 ```{r}
 
 all_species=all_species|>
- mutate(collapsed_value=ifelse(collapsed=="TRUE", 1, 0))|>
+ mutate(collapsed_value=ifelse(collapsed=="TRUE", 1, 0))
   
   
 
