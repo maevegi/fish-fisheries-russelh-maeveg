@@ -1,5 +1,5 @@
 
-*add GitHub Actions CI badge here*
+[![Reproducibility](https://github.com/espm-157/fish-fisheries-russelh-maeveg/actions/workflows/main.yml/badge.svg)](https://github.com/espm-157/fish-fisheries-russelh-maeveg/actions/workflows/main.yml)
 
 ## Team Members:
 
