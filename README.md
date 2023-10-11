@@ -1,15 +1,13 @@
 
-*add GitHub Actions CI badge here*
+[![Reproducibility](https://github.com/espm-157/fish-fisheries-russelh-maeveg/actions/workflows/main.yml/badge.svg)](https://github.com/espm-157/fish-fisheries-russelh-maeveg/actions/workflows/main.yml)
 
 ## Team Members:
 
-- full name, github handle
-- full name, github handle
+- Russell Huang, Huangary1126
+- Maeve Gilbert, maevegi
 
-This repository is a template for your team's repository.
-
-## assignment
-
+## Assignment Description
+This module examines global fish stock data based on the RAM Legacy Database. The work is an attempt to reproduce the data examined by Worm et al. (2006) which examined the collapse of Canadian Atlantic cod stocks. The second table in this module examines global fish stocks.
 All work for this assignment should be in the `assignment` directory.  You will work in the `.Rmd` notebook, and commit your rendered output files (`.md` and associated files) in the `assignment` directory as well.
 
 ## Special files
