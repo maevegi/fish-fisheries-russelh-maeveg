@@ -106,6 +106,7 @@ cod |>
   ggplot(mapping=aes(tsyear, total)) + geom_point() + geom_line()
 ```
 ```{r}
+#Not sure what this chunk does. Delete?
 mea_cod <- cod |>
   filter(assessid == "DFO-NFLD-COD2J3KL-1850-2011-CHING")
 ```
@@ -177,7 +178,7 @@ recent_species<-
   select(assessid)
 recent_species
 ```
-
+Total species count table
 ```{r}
 all_species<-fish|>
   inner_join(recent_species, by = "assessid")|>
@@ -189,13 +190,19 @@ all_species
 Create a new column that assigns a numeric value to TRUE or FALSE from collapse column. Plot data based on these values (1 or 0). 
 ```{r}
 
-all_species<-
- mutate(collapsed_value=ifelse(collapsed=="TRUE", 1, 0))
-  #summarize(sum=sum(collapsed))
+all_species=all_species|>
+ mutate(collapsed_value=ifelse(collapsed=="TRUE", 1, 0))|>
+  
+  
+
+
+#group_by(tsyear)|>
+  #summarize(sum=sum(collapsed_value, na.rm=TRUE))
+all_species
 
 
  # mutate(collapsed_value=ifelse(collapsed==TRUE, 1, 0))
-
+#calculate number of one values per year
 ```
 
 ```
