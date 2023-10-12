@@ -127,7 +127,6 @@ We will use data from the [RAM Legacy Stock Assessment Database](https://www.ram
 Now we are ready to dive into our data. First, We seek to replicate the following figure from the Millennium Ecosystem Assessment Project using the RAM data.
 
 ![](http://espm-157.carlboettiger.info/img/cod.jpg)
-```
 
 ------------------------------------------------------------------------
 
@@ -139,7 +138,8 @@ We seek to replicate the temporal trend in stock declines shown in [Worm et al 2
 
 ![](http://espm-157.carlboettiger.info/img/worm2006.jpg)
 
-```
+Calculating collapse values for all code species. 
+
 ```{r}
 total_cod <- fish |> 
   filter(scientificname == "Gadus morhua") |>
@@ -178,7 +178,9 @@ all_species <- fish |>
   summarise(total_catch = sum(tsvalue, na.rm = TRUE)) |>
   group_by(scientificname) |>
   mutate(historical_max = max(total_catch), #historical maximum of catch 
-        is_collapse = total_catch < 0.1 * historical_max, ever_collapse = cumsum(is_collapse) > 0)
+        is_collapse = total_catch < 0.1 * historical_max, 
+        ever_collapse = cumsum(is_collapse) > 0) #has the stock ever collapsed at any point in history, if so, value is greater than 0
+#collapse value if true if stock has dropped below 10% of historical maximum
 all_species
 ```
 
@@ -187,18 +189,17 @@ all_species
 time_span <- 1950:2020
 
 
-recent_data <- nrow(all_species %>%
-                      #group_by(scientificname, tsyear) |>
-                      filter(tsyear %in% time_span) |>
-                      #group_by(scientificname) |>
-                      count() |>
-                      filter(recent_data == length(time_span)))
+recent_data <- nrow(all_species |>
+                      group_by(scientificname, tsyear)|> 
+                      filter(tsyear %in% time_span)|>
+                      group_by(scientificname)|>
+                      count()|>
+                      filter(n == length(time_span)))
 recent_data
+#counting number of rows in specified time span where all of the data for the species appears in the time span 
+
 #how many years each species is observed
-recent_data<-nrow(all_species|>
-                    filter(tsyear %in% time_span)|>
-                    group_by(scientificname)|>
-                    count())
+
 ```
 ```{r}
 
@@ -217,14 +218,17 @@ recent_species
 ```
 Total species count table
 ```{r}
-all_species_prop<-all_species|>
-  filter(tsyear %in% time_span)|>
-  group_by(tsyear)|>
+all_species_prop<-all_species|> 
+  filter(tsyear %in% time_span)|> 
+  group_by(tsyear)|> 
   summarise(collapse=sum(is_collapse),
-            cumu_collapsed/recent_data)|>
-  select(tsyear, )
- mutate(collapsed=tsvalue<0.10* max(tsvalue, na.rm=TRUE))
-all_species
+            ever_collapse=sum(ever_collapse))|>
+  mutate(percent_collapse=(collapse/recent_data)*100) |>
+  mutate(percent_collapse_cum=(ever_collapse/recent_data)*100)|>
+  ggplot(aes(tsyear, percent_collapse))+ geom_line()+scale_y_reverse()
+
+
+all_species_prop
 ```
 Create a new column that assigns a numeric value to TRUE or FALSE from collapse column. Plot data based on these values (1 or 0). 
 ```{r}
