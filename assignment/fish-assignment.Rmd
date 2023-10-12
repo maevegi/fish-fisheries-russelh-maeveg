@@ -13,6 +13,7 @@ download.file("https://zenodo.org/record/7814638/files/RAMLDB%20v4.61.zip?downlo
 ```
 ```{r}
 unzip("fish.zip")
+unlink(list.files(".", pattern = "[.]zip"))
 ```
 
 ```{r}
@@ -224,8 +225,12 @@ all_species_prop<-all_species|>
   summarise(collapse=sum(is_collapse),
             ever_collapse=sum(ever_collapse))|>
   mutate(percent_collapse=(collapse/recent_data)*100) |>
-  mutate(percent_collapse_cum=(ever_collapse/recent_data)*100)|>
-  ggplot(aes(tsyear, percent_collapse))+ geom_line()+scale_y_reverse()
+  mutate(percent_collapse_cum=(ever_collapse/recent_data)*100)
+  #ggplot(aes(tsyear, percent_collapse))+ geom_line()+scale_y_reverse()
+ggplot(all_species_prop, aes(x=tsyear))+
+  geom_line(aes(y=percent_collapse), col="red")+
+  geom_line(aes(y=percent_collapse_cum), col="blue")+
+  ggtitle("Global Fish Stocks Collapse")
 
 
 all_species_prop
