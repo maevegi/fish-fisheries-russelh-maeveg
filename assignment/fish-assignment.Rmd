@@ -178,7 +178,7 @@ all_species <- fish |>
   group_by(tsyear,scientificname) |>
   summarise(total_catch = sum(tsvalue, na.rm = TRUE)) |>
   group_by(scientificname) |>
-  mutate(historical_max = max(total_catch), #historical maximum of catch 
+  mutate(historical_max = cummax(total_catch), #historical maximum of catch 
         is_collapse = total_catch < 0.1 * historical_max, 
         ever_collapse = cumsum(is_collapse) > 0) #has the stock ever collapsed at any point in history, if so, value is greater than 0
 #collapse value if true if stock has dropped below 10% of historical maximum
@@ -187,7 +187,7 @@ all_species
 
 #1950-2020
 ```{r}
-time_span <- 1950:2020
+time_span <- 1950:2003
 
 
 recent_data <- nrow(all_species |>
@@ -202,11 +202,8 @@ recent_data
 #how many years each species is observed
 
 ```
-```{r}
 
-```
-
-#calculate cumulative number of stocks collapsed (ie show number of collapsed stocks by 1960, instead of number of stocks colapsed in each year)
+#calculate cumulative number of stocks collapsed (ie show number of collapsed stocks by 1960, instead of number of stocks collapsed in each year)
 
 #Assessing multiple species data
 ```{r}
@@ -226,14 +223,15 @@ all_species_prop<-all_species|>
             ever_collapse=sum(ever_collapse))|>
   mutate(percent_collapse=(collapse/recent_data)*100) |>
   mutate(percent_collapse_cum=(ever_collapse/recent_data)*100)
+all_species_prop
   #ggplot(aes(tsyear, percent_collapse))+ geom_line()+scale_y_reverse()
 ggplot(all_species_prop, aes(x=tsyear))+
   geom_line(aes(y=percent_collapse), col="red")+
   geom_line(aes(y=percent_collapse_cum), col="blue")+
-  ggtitle("Global Fish Stocks Collapse")
-
-
+  ggtitle("Global Fish Stocks Collapse")+
+    scale_y_reverse()
 all_species_prop
+
 ```
 Create a new column that assigns a numeric value to TRUE or FALSE from collapse column. Plot data based on these values (1 or 0). 
 ```{r}
