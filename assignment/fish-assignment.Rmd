@@ -15,104 +15,6 @@ download.file("https://zenodo.org/record/7814638/files/RAMLDB%20v4.61.zip?downlo
 unzip("fish.zip")
 unlink(list.files(".", pattern = "[.]zip"))
 ```
-
-```{r}
-mcatch<-read_csv("RAMCore/MCatch.csv")
-mcatch
-```
-```{r}
-xlsx<-"Excel/RAMLDB v4.61 (assessment data only).xlsx"
-readxl::excel_sheets(xlsx)
-
-ts1<-read_xlsx(xlsx, sheet="timeseries.1")
-ts2<-read_xlsx(xlsx, sheet="timeseries.2")
-area<- read_xlsx(xlsx, sheet= "area")
-stock<- read_xlsx(xlsx, sheet= "stock")
-metrics<- read_xlsx(xlsx, sheet= "tsmetrics")
-metrics
-assess<- read_xlsx(xlsx, sheet="assessment")
-
-ts<-bind_rows(ts1, ts2) |> 
-  distinct()|> 
-  filter(tsid=="TCbest-MT")
-```
-
-```{r}
-most_recent<-
-  assess|>
-  left_join(stock) |>
-  filter(commonname=="Atlantic cod")|>
-  filter(mostrecent==999)|>
-  select(assessid)
-most_recent
-```
-
-```{r}
-units<-metrics |> 
-  filter(tscategory=="CATCH or LANDINGS") |>
-  filter(tsunitslong=="Metric tons")
-units
-```
-```{r}
-ts<-ts|> left_join(metrics, by=c("tsid"="tsunique"))
-ts
-```
-
-```{r}
-area |> 
-  filter(country == "Canada") |>
-  distinct(country, areacode)
-```
-
-```{r}
-fish<- ts|> 
-  left_join(metrics, by=c("tsid"="tsunique"))|>
-  left_join(stock)|>
-  left_join(area)
-fish
-```
-
-We want to examine Atlantic cod, _Gadus mordhua_. 
-```{r}
-cod <- fish |> 
-  filter(scientificname == "Gadus morhua") |>
-  filter(country == "Canada") |>
-  inner_join(most_recent, by = "assessid") 
-cod
-```
-#Filtering data by "stockid"
-```{r}
-cod_2J3KL <- fish |>
-  filter(scientificname == "Gadus morhua") |>
-  filter(stockid == "COD2J3KL") |>
-  filter(areaid == "Canada-DFO-2J3KL") |>
-  inner_join(most_recent, by = "assessid")
-cod_2J3KL
-```
-#Determining which Canadian cod stocks are considered collapsed
-```{r}
-collapse<-cod_2J3KL |> 
-  select(tsyear, tsvalue, stockid, areaid) |>
-  mutate(collapsed = tsvalue < 0.1*max(tsvalue, na.rm=TRUE))
-collapse
-```
-#Filtering the data by "areaname" instead of "stockid"
-```{r}
-cod |>
-  filter(scientificname == "Gadus morhua") |>
-  filter(areaname == "Southern Labrador-Eastern Newfoundland") |>
-  inner_join(most_recent, by = "assessid") |>
-  group_by(tsyear) |>
-  summarise(total = sum(tsvalue, na.rm = TRUE)) |>
-  ggplot(mapping=aes(tsyear, total)) + geom_point() + geom_line()
-```
-```{r}
-#Not sure what this chunk does. Delete?
-mea_cod <- cod |>
-  filter(assessid == "DFO-NFLD-COD2J3KL-1850-2011-CHING")
-```
-
-
 # Unit 2: Fisheries Collapse Module
 
 This module will focus on understanding and replicating fisheries stock assessment data and fisheries collapse.
@@ -125,9 +27,116 @@ We will use data from the [RAM Legacy Stock Assessment Database](https://www.ram
 
 # Exercise 1: Investigating the North-Atlantic Cod
 
-Now we are ready to dive into our data. First, We seek to replicate the following figure from the Millennium Ecosystem Assessment Project using the RAM data.
+First, We seek to replicate the following figure from the Millennium Ecosystem Assessment Project using the RAM data.
+```{r}
+![](http://espm-157.carlboettiger.info/img/cod.jpg)
+```
 
 ![](http://espm-157.carlboettiger.info/img/cod.jpg)
+```{r}
+mcatch<-read_csv("RAMCore/MCatch.csv")
+mcatch
+```
+
+Here we read in all the necessary sheets from the dataset.
+```{r}
+xlsx<-"Excel/RAMLDB v4.61 (assessment data only).xlsx"
+readxl::excel_sheets(xlsx)
+
+ts1<-read_xlsx(xlsx, sheet="timeseries.1")
+ts2<-read_xlsx(xlsx, sheet="timeseries.2")
+area<- read_xlsx(xlsx, sheet= "area")
+stock<- read_xlsx(xlsx, sheet= "stock")
+metrics<- read_xlsx(xlsx, sheet= "tsmetrics")
+metrics
+assess<- read_xlsx(xlsx, sheet="assessment")
+```
+
+Here we combined both "timeseries" datasheets (timeseries.1 and timeseries.2) and filtered them by TCbest-MT (Total catch in metric tons)
+```{r}
+ts<-bind_rows(ts1, ts2) |> 
+  distinct()|> 
+  filter(tsid=="TCbest-MT")
+```
+
+We want to see the most recent stock data for Atlantic Cod. This table displays all the assessid of the Atlantic cod.
+```{r}
+most_recent<-
+  assess|>
+  left_join(stock) |>
+  filter(commonname=="Atlantic cod")|>
+  filter(mostrecent==999)|>
+  select(assessid)
+most_recent
+```
+
+We are looking at all the CATCH or LANDINGS in Metric tons from the "metrics" data sheet.
+```{r}
+units<-metrics |> 
+  filter(tscategory=="CATCH or LANDINGS") |>
+  filter(tsunitslong=="Metric tons")
+units
+```
+
+We're combining the ts table with the "metrics table we just created and reassigned "tsid" to the "tsunique" column.
+```{r}
+ts<-ts|> left_join(metrics, by=c("tsid"="tsunique"))
+ts
+```
+
+Because we want to observe the regions in the East Coast, we decided to filter the "area" sheet by country (Canada) and subsequently by the distinct number of areacodes within Canada (there are 207 total).
+```{r}
+area |> 
+  filter(country == "Canada") |>
+  distinct(country, areacode)
+```
+
+We then created a table that is based on the ts data joined with the metrics, stock, and area. This allows us to create a comprehensive list of all species with their multiple identifiers. 
+```{r}
+fish <- ts|> 
+  left_join(metrics, by=c("tsid"="tsunique"))|>
+  left_join(stock)|>
+  left_join(area)
+fish
+```
+
+We want to only examine Atlantic cod as we are replicating the results from papers that looked into the collapse of Atlantic cod (Gadus morhua). To do this, we created a new table that only looked at Canadian cod by filtering by the scientific name and country. Afterwards, we joined that to the "most_recent" table as it contains information of the stock data Atlantic cod in Canada.
+```{r}
+cod <- fish |> 
+  filter(scientificname == "Gadus morhua") |>
+  filter(country == "Canada") |>
+  inner_join(most_recent, by = "assessid") 
+cod
+```
+#Filtering data by "stockid"
+We are trying to find the specific stock used to generate the graphs in the published data. To do this, we filtered the data via stockid and areaid. 
+```{r}
+cod_2J3KL <- fish |>
+  filter(scientificname == "Gadus morhua") |>
+  filter(stockid == "COD2J3KL") |>
+  filter(areaid == "Canada-DFO-2J3KL") |>
+  inner_join(most_recent, by = "assessid")
+cod_2J3KL
+```
+#Determining which Canadian cod stocks are considered collapsed
+Once we determine the relevant stock in the specific area, we need to determine during which years the stock collapsed. In this case, collapsed is determined whether the total catch was less than 10% of the historical maximum. However, the historical maximum is contingent to the timespan of the data. 
+```{r}
+collapse<-cod_2J3KL |> 
+  select(tsyear, tsvalue, stockid, areaid) |>
+  mutate(collapsed = tsvalue < 0.1*max(tsvalue, na.rm=TRUE))
+collapse
+```
+#Filtering the data by "areaname" instead of "stockid"
+The following code replicates what was done previously, but instead of filtering by area ID, we determined the correct stock through trial and error of the area names. From there, we added the most recent data table, which contained information about total catch amounts. We then plotted this data by year and total catch. It should be noted that the original graph from the Millenium Ecosystem Assessment contains data from 1850 to 2000. Since we filtered the data earlier to the more recent values, our graph starts in 1950. Data from before 1950 excluded because it is not considered as reliable.
+```{r}
+cod |>
+  filter(scientificname == "Gadus morhua") |>
+  filter(areaname == "Southern Labrador-Eastern Newfoundland") |>
+  inner_join(most_recent, by = "assessid") |>
+  group_by(tsyear) |>
+  summarise(total = sum(tsvalue, na.rm = TRUE)) |>
+  ggplot(mapping=aes(tsyear, total)) + geom_point() + geom_line()
+```
 
 ------------------------------------------------------------------------
 
@@ -139,8 +148,8 @@ We seek to replicate the temporal trend in stock declines shown in [Worm et al 2
 
 ![](http://espm-157.carlboettiger.info/img/worm2006.jpg)
 
-Calculating collapse values for all code species. 
 
+Rather than beginning with all of the species, we first attempted to examine only a slightly larger data set that included all stocks of Canadian cod. The following chunks represent our initial attempts to calculate the collapse value for each stock. As you can see, we were largely unsuccessful. However, we kept these chunks for reference and to showcase our thought process while doing this exercise. 
 ```{r}
 total_cod <- fish |> 
   filter(scientificname == "Gadus morhua") |>
@@ -171,7 +180,7 @@ Denominator could be total number of stocks reported in study (look at paper on 
 true is also equal to 1, false is equal to zero
 if true then plot it
 
-#All species
+In order to examine all the species present in the data, we began with the earlier "fish" table. Again, we only wanted to examine total catch in metric tons. Because we want to filter the data by the percent collapsed per species per year, the data had to be first grouped by year and scientific name. Then, we found the sum of the total catch values of each of the species in each year. After that, we added a column to the data that calculated whether or not the stock had collapsed based on the historical maximum. One column, is.collapse, represents whether each stock had collapsed per year. The other column, ever_collapse, calculates the total number of species that have collapsed up until and including that year. 
 ```{r}
 all_species <- fish |>
   filter(tsid == "TCbest-MT") |>
@@ -185,7 +194,7 @@ all_species <- fish |>
 all_species
 ```
 
-#1950-2020
+The original study examined catch values from 1950 to 2003. We therefore had to assign this time span to a variable, time_span. From there, we were able to determine the number of species that had continuously appeared throughout this period. This was done by filtering the years to only those in the time span and counting the number of rows where the number of species appearances was equal to our specified time span. 
 ```{r}
 time_span <- 1950:2003
 
@@ -203,18 +212,7 @@ recent_data
 
 ```
 
-#calculate cumulative number of stocks collapsed (ie show number of collapsed stocks by 1960, instead of number of stocks collapsed in each year)
-
-#Assessing multiple species data
-```{r}
-recent_species<-
-  assess|>
-  left_join(stock) |>
-  filter(mostrecent==999)|>
-  select(assessid)
-recent_species
-```
-Total species count table
+After we established the number of species that would be present in this new data set (118), we could then calculate the collapse values for each species. 
 ```{r}
 all_species_prop<-all_species|> 
   filter(tsyear %in% time_span)|> 
@@ -234,12 +232,6 @@ fish_plot<-ggplot(all_species_prop, aes(x=tsyear))+
     scale_y_reverse()
 fish_plot
 
-legend("topright", legend=c("Percent Collapsed", "Cumulative Percent Collapse"))
-
-
-all_species_prop
-#make a legend (assign category variables to each type, plot data based on category type, different colors)
-#try to pivot longer 
 ```
 
 Create a new column that assigns a numeric value to TRUE or FALSE from collapse column. Plot data based on these values (1 or 0). 
