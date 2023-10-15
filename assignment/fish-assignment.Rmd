@@ -224,15 +224,24 @@ all_species_prop<-all_species|>
   mutate(percent_collapse=(collapse/recent_data)*100) |>
   mutate(percent_collapse_cum=(ever_collapse/recent_data)*100)
 all_species_prop
-  #ggplot(aes(tsyear, percent_collapse))+ geom_line()+scale_y_reverse()
-ggplot(all_species_prop, aes(x=tsyear))+
-  geom_line(aes(y=percent_collapse), col="red")+
-  geom_line(aes(y=percent_collapse_cum), col="blue")+
-  ggtitle("Global Fish Stocks Collapse")+
-    scale_y_reverse()
-all_species_prop
 
+fish_plot<-ggplot(all_species_prop, aes(x=tsyear))+
+  geom_line(aes(y=percent_collapse, col="Percent Collapsed"))+
+  geom_line(aes(y=percent_collapse_cum, col="Cumulative Percent Collapsed"))+
+  ggtitle("Global Fish Stocks Collapse")+
+  xlab("Year")+
+  ylab("Percent of Stocks Collapsed")+
+    scale_y_reverse()
+fish_plot
+
+legend("topright", legend=c("Percent Collapsed", "Cumulative Percent Collapse"))
+
+
+all_species_prop
+#make a legend (assign category variables to each type, plot data based on category type, different colors)
+#try to pivot longer 
 ```
+
 Create a new column that assigns a numeric value to TRUE or FALSE from collapse column. Plot data based on these values (1 or 0). 
 ```{r}
 
