@@ -7,7 +7,7 @@
 - Maeve Gilbert, maevegi
 
 ## Assignment Description
-This module examines global fish stock data based on the RAM Legacy Database. The work is an attempt to reproduce the data examined the Millennium Ecosystem Assessment, which examined the collpase of Atlantic cod stocks in Canada, and the paper by Worm et al. (2006) which examined the collapse of global fish stocks. The relevant papers can be found here:
+This module examines global fish stock data based on the RAM Legacy Database. The work is an attempt to reproduce the data examined in the Millennium Ecosystem Assessment, which examined the collapse of Atlantic cod stocks in Canada, and the paper by Worm et al. (2006) which examined the collapse of global fish stocks. The relevant papers can be found here:
 https://doi.org/10.1126/science.1132294, 
 https://doi.org/10.1111/j.1467-2979.2011.00435.x, 
 https://doi.org/10.1073/pnas.1604008113. 
