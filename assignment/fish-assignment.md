@@ -21,8 +21,8 @@ assessment data and fisheries collapse.
 
 Instead of working with independent data.frames, we will be working with
 a large relational database which contains many different tables of
-different sizes and shapes, but that all all related to each other
-through a series of different ids.
+different sizes and shapes, but are all related to each other through a
+series of different ids.
 
 ## The Database
 
@@ -31,7 +31,7 @@ Database](https://www.ramlegacy.org/database/)
 
 # Exercise 1: Investigating the North-Atlantic Cod
 
-First, We seek to replicate the following figure from the Millennium
+First, we seek to replicate the following figure from the Millennium
 Ecosystem Assessment Project using the RAM data.
 
 ``` r
@@ -391,10 +391,10 @@ table, which contained information about total catch amounts. We then
 plotted this data by year and total catch. It should be noted that the
 original graph from the Millennium Ecosystem Assessment contains data
 from 1850 to 2000. Since we filtered the data earlier to the more recent
-values, our graph starts in 1950. Data from before 1950 excluded because
-it is not considered as reliable. The graph is the same as the one that
-would be produced from the area ID data, but instead is filtered by area
-name.
+values, our graph starts in 1950. Data from before 1950 are excluded
+because it is not considered as reliable. The graph is the same as the
+one that would be produced from the area ID data, but instead is
+filtered by area name.
 
 ``` r
 cod |>
@@ -509,9 +509,9 @@ total_cod
 
 In order to examine all the species present in the data, we began with
 the earlier “fish” table. Again, we only wanted to examine total catch
-in metric tons. Because we want to filter the data by the percent
-collapsed per species per year, the data had to be first grouped by year
-and scientific name. Then, we found the sum of the total catch values of
+in metric tons. Because we want to filter the data by percent collapsed
+per species per year, the data had to be first grouped by year and
+scientific name. Then, we found the sum of the total catch values of
 each of the species in each year. After that, we added a column to the
 data that calculated whether or not the stock had collapsed based on the
 historical maximum. One column, is_collapse, represents whether each
@@ -553,8 +553,8 @@ all_species
     ## 10   1809 Hippoglossus hip…           0              0 FALSE       FALSE        
     ## # ℹ 21,238 more rows
 
-The original study examined catch values from 1950 to 2003. We therefore
-had to assign this time span to a variable, time_span. From there, we
+The original study examined catch values from 1950 to 2003. Therefore,
+we had to assign this time span to a variable, time_span. From there, we
 were able to determine the number of species that had continuously
 appeared throughout this period. This was done by filtering the years to
 only those in the time span and counting the number of rows where the
@@ -562,7 +562,6 @@ number of species appearances was equal to our specified time span.
 
 ``` r
 time_span <- 1950:2003
-
 
 recent_data <- nrow(all_species |>
                       group_by(scientificname, tsyear)|> 
