@@ -7,18 +7,17 @@
 - Maeve Gilbert, maevegi
 
 ## Assignment Description
-This module examines global fish stock data based on the RAM Legacy Database. The work is an attempt to reproduce the data examined by Worm et al. (2006) which examined the collapse of Canadian Atlantic cod stocks. The second table in this module examines global fish stocks.
-All work for this assignment should be in the `assignment` directory.  You will work in the `.Rmd` notebook, and commit your rendered output files (`.md` and associated files) in the `assignment` directory as well.
+This module examines global fish stock data based on the RAM Legacy Database. The work is an attempt to reproduce the data examined the Millennium Ecosystem Assessment, which examined the collpase of Atlantic cod stocks in Canada, and the paper by Worm et al. (2006) which examined the collapse of global fish stocks. The relevant papers can be found here:
+https://doi.org/10.1126/science.1132294
+https://doi.org/10.1111/j.1467-2979.2011.00435.x
+https://doi.org/10.1073/pnas.1604008113
+All work for this assignment is in the `assignment` directory.  
 
-## Special files
-
-All team repositories will also include most of the special files found here:
 
 ### Common files
 
 - `README.md` this file, a general overview of the repository in markdown format.  
 - `.gitignore` Optional file, ignore common file types we don't want to accidentally commit to GitHub. Most projects should use this. 
-- `<REPO-NAME>.Rproj` Optional, an R-Project file created by RStudio for it's own configuration.  Some people prefer to `.gitignore` this file.
 
 
 ### Infrastructure for Testing
