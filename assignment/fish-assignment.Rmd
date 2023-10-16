@@ -9,7 +9,8 @@ library(tidyverse)
 library(readxl)
 ```
 ```{r}
-download.file("https://zenodo.org/record/7814638/files/RAMLDB%20v4.61.zip?download=1", "fish.zip")
+#download.file("https://zenodo.org/record/7814638/files/RAMLDB%20v4.61.zip?download=1", "fish.zip")
+download.file("https://minio.carlboettiger.info/shared-data/ram.zip", "fish.zip")
 ```
 ```{r}
 unzip("fish.zip")
@@ -30,7 +31,7 @@ We will use data from the [RAM Legacy Stock Assessment Database](https://www.ram
 
 First, We seek to replicate the following figure from the Millennium Ecosystem Assessment Project using the RAM data.
 ```{r}
-!(http://espm-157.carlboettiger.info/img/cod.jpg)
+#!(http://espm-157.carlboettiger.info/img/cod.jpg)
 ```
 
 ![](http://espm-157.carlboettiger.info/img/cod.jpg)
@@ -79,7 +80,7 @@ units<-metrics |>
 units
 ```
 
-Next, we are combining the ts table with the "metrics table we just created and reassigned "tsid" to the "tsunique" column.
+Next, we are combining the ts table with the "metrics" table we just created and reassigned "tsid" to the "tsunique" column.
 ```{r}
 ts<-ts|> left_join(metrics, by=c("tsid"="tsunique"))
 ts
@@ -118,7 +119,8 @@ cod_2J3KL <- fish |>
   inner_join(most_recent, by = "assessid")
 cod_2J3KL
 ```
-#Determining which Canadian cod stocks are considered collapsed
+###Determining which Canadian cod stocks are considered collapsed
+------
 Once we determine the relevant stock in the specific area, we need to determine during which years the stock collapsed. In this case, collapsed is determined by whether the total catch was less than 10% of the historical maximum. However, the historical maximum is contingent to the time span of the data. 
 ```{r}
 collapse<-cod_2J3KL |> 
@@ -136,7 +138,9 @@ cod |>
   summarise(total = sum(tsvalue, na.rm = TRUE)) |>
   ggplot(mapping=aes(tsyear, total)) + geom_point() + geom_line()
 ```
-Like the original graph, Atlantic cod stock peaks in the late 1960s and begins to decline, with stocks almost entirly collapsed by the mid 1990s.
+
+Like the original graph, Atlantic cod stock peaks in the late 1960s and begins to decline, with stocks almost entirely collapsed by the mid 1990s.
+
 ------------------------------------------------------------------------
 
 # Exercise 2: Group Assignment
@@ -146,7 +150,8 @@ Like the original graph, Atlantic cod stock peaks in the late 1960s and begins t
 We seek to replicate the temporal trend in stock declines shown in [Worm et al 2006](http://doi.org/10.1126/science.1132294):
 
 ![](http://espm-157.carlboettiger.info/img/worm2006.jpg)
-#Examining all Canadian cod stocks
+###Examining all Canadian cod stocks
+-------------
 Rather than beginning with all of the species, we first attempted to examine only a slightly larger data set that included all stocks of Canadian cod. The following chunks represent our initial attempts to calculate the collapse value for each stock. As you can see, we were largely unsuccessful. However, we kept these chunks for reference and to showcase our thought process while doing this exercise. 
 ```{r}
 total_cod <- fish |> 
@@ -171,7 +176,8 @@ total_cod
 #group by species and then sort by collapsed (true/false)
 # calculate collapse value per stock 
 ```
-#Examining all stocks in the database
+###Examining all stocks in the database
+-------
 In order to examine all the species present in the data, we began with the earlier "fish" table. Again, we only wanted to examine total catch in metric tons. Because we want to filter the data by the percent collapsed per species per year, the data had to be first grouped by year and scientific name. Then, we found the sum of the total catch values of each of the species in each year. After that, we added a column to the data that calculated whether or not the stock had collapsed based on the historical maximum. One column, is_collapse, represents whether each stock had collapsed per year. The other column, ever_collapse, calculates the total number of stocks that have collapsed up until and including that year. 
 ```{r}
 all_species <- fish |>
@@ -239,4 +245,4 @@ new_time <- nrow(all_species |>
 new_time
 
 ```
-Another point to note is that the definition of collapse is rather limited, as it assumes that once a stock has collapsed within a certain year, it remains so and stays in the cumulative collapse values. However, some stocks actually did not remain collapsed. There are other limitations to the database discussed in Ricard et al. (2013), some of which include limited reporting in many parts of the world, with much of the data collected in the northern hemisphere. Furthermore, the stocks that have been assessed in the database represent a small proportion of harvested stocks. 
+Another point to note is that the definition of collapse is rather limited, as it assumes that once a stock has collapsed within a certain year, it remains so and stays in the cumulative collapse values. However, some stocks actually did not remain collapsed. There are other limitations to the database discussed in Ricard et al. (2013), some of which include limited reporting in many parts of the world, with much of the data collected in the northern hemisphere. Furthermore, the stocks that have been assessed in the database represent a small proportion of total harvested stocks. 
